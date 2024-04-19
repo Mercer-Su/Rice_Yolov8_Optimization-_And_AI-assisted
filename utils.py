@@ -253,11 +253,12 @@ def infer_uploaded_webcam_http(conf, model):
         async_transform=True
     )
 
-    if webrtc_ctx.video_transformer:
-        st.text("摄像头正在运行...")
-        if st.button("终止执行"):
-            webrtc_ctx.state.playing = False  # 停止视频流
-    else:
-        st.text("点击下方按钮开始摄像头")
-        if st.button("开始执行"):
-            webrtc_ctx.state.playing = True  # 开始视频流
+
+ # if webrtc_ctx.video_transformer:
+    #     st.text("摄像头正在运行...")
+    #     if st.button("终止执行"):
+    #         webrtc_ctx.state.playing = False  # 停止视频流
+    # else:
+    #     st.text("点击下方按钮开始摄像头")
+    #     if st.button("开始执行"):
+    #         webrtc_ctx.state.playing = True  # 开始视频流
