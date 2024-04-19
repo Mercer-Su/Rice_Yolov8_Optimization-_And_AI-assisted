@@ -15,7 +15,7 @@ if root_path not in sys.path:
 #获取当前项目(工作目录)的相对路径
 ROOT = root_path.relative_to(Path.cwd())
 #数据源
-SOURCES_LIST = ["图像", "视频","摄像头"]
+SOURCES_LIST = ["图像", "视频","摄像头","网络摄像头"]
 
 # 模型路径配置
 DETECTION_MODEL_DIR = ROOT / 'weights'

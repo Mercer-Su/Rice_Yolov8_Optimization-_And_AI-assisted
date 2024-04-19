@@ -1,12 +1,8 @@
 from pathlib import Path
 
-import pandas as pd
-import streamlit as st
 import config
-from utils import load_model, infer_uploaded_image, infer_uploaded_video, infer_uploaded_webcam
+from utils import load_model, infer_uploaded_image, infer_uploaded_video, infer_uploaded_webcam, infer_uploaded_webcam_http
 
-import json
-import time
 import random
 import datetime
 import base64
@@ -16,11 +12,6 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
-from streamlit_echarts import st_echarts
-
-# from streamlit.server.server import Server
-# # from streamlit.script_run_context import get_script_run_ctx as get_report_ctx
-# from streamlit.scriptrunner import get_script_run_ctx as get_report_ctx
 
 import graphviz
 import pydeck as pdk
@@ -32,10 +23,11 @@ from pyecharts.globals import ThemeType
 from pyecharts import options as opts
 from pyecharts.commons.utils import JsCode
 
-from PIL import Image
-from io import BytesIO
-
 import warnings
+
+import streamlit as st
+from streamlit_webrtc import webrtc_streamer
+
 
 # 忽略特定类型的警告
 warnings.filterwarnings("ignore", message="st.cache is deprecated", category=DeprecationWarning)
@@ -102,6 +94,8 @@ def main():
         infer_uploaded_image(confidence, model)
     elif source_selectbox == config.SOURCES_LIST[1]:  # 视频
         infer_uploaded_video(confidence, model)
+    elif source_selectbox == config.SOURCES_LIST[3]:  # 网络摄像头
+        infer_uploaded_webcam_http(confidence, model)
     else:
         st.error("目前仅支持 '图片' '视频' '本地摄像头' ")
     charts_mapping = {

@@ -1,8 +1,10 @@
 from ultralytics import YOLO
-import streamlit as st
 import cv2
 from PIL import Image
 import tempfile
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration
+import av
+import streamlit as st
 
 def infer_uploaded_image(conf, model):
     """
@@ -203,3 +205,59 @@ def infer_uploaded_webcam(conf, model):
                 break
     except Exception as e:
         st.error(f"Error loading video: {str(e)}")
+
+#         def transform(self, frame):
+#             img = frame.to_ndarray(format="bgr24")  # 将帧转换为ndarray格式
+#
+#             # 这里应该是你的模型推理代码
+#             # 例如: results = model.predict(img)
+#             # 然后根据置信度过滤结果
+#             # filtered_results = filter(lambda x: x['confidence'] >= conf, results)
+#             # 注意：你需要自己实现模型推理和结果过滤的逻辑
+#             # 这里只是一个示例
+#
+#             # 如果需要在视频帧上绘制结果，可以在这里添加绘制代码
+#             # 例如: img = draw_results(img, filtered_results)
+#
+#             # 将处理后的帧返回到视频流中
+#             return av.VideoFrame.from_ndarray(img, format="bgr24")
+
+class VideoTransformer(VideoTransformerBase):
+    def __init__(self, model, conf):
+        self.model = model
+        self.conf = conf
+
+    def transform(self, frame):
+        img = frame.to_ndarray(format="bgr24")
+
+        # 使用YOLO模型进行推理
+        res = self.model.predict(img, conf=self.conf)
+        res_plotted = res[0].plot()  # 假设plot返回的是BGR图像
+
+        # 将处理后的帧返回到视频流中
+        return av.VideoFrame.from_ndarray(res_plotted, format="bgr24")
+
+# 使用WebRTC进行网络摄像头视频流处理
+def infer_uploaded_webcam_http(conf, model):
+    # WebRTC配置
+    rtc_configuration = RTCConfiguration(
+        {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+    )
+
+    # 创建WebRTC流
+    webrtc_ctx = webrtc_streamer(
+        key="example",
+        video_transformer_factory=lambda: VideoTransformer(model, conf),
+        rtc_configuration=rtc_configuration,
+        media_stream_constraints={"video": True, "audio": False},
+        async_transform=True
+    )
+
+    if webrtc_ctx.video_transformer:
+        st.text("摄像头正在运行...")
+        if st.button("终止执行"):
+            webrtc_ctx.state.playing = False  # 停止视频流
+    else:
+        st.text("点击下方按钮开始摄像头")
+        if st.button("开始执行"):
+            webrtc_ctx.state.playing = True  # 开始视频流
