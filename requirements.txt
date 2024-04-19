@@ -1,5 +1,5 @@
-streamlit==1.26.0
-ultralytics==8.0.170
+streamlit>=1.26.0
+ultralytics>=8.0.170
 requests
 pandas
 numpy
