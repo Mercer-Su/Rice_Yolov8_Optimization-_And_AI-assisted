@@ -1,0 +1,17 @@
+streamlit==1.26.0
+ultralytics==8.0.170
+requests
+pandas
+numpy
+streamlit>=1.11.1
+click>=8
+matplotlib
+altair>=4.2.2
+plotly
+PyDeck>=0.7.1
+graphviz
+scipy
+Pillow
+streamlit-player
+streamlit-echarts
+pyecharts>=2.0.0
