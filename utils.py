@@ -1,10 +1,59 @@
+from pyexpat.errors import messages
 from ultralytics import YOLO
+from http import HTTPStatus
 import cv2
 from PIL import Image
 import tempfile
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration
 import av
+import json
 import streamlit as st
+import pandas as pd
+
+import dashscope
+
+dashscope.api_key = "sk-6ca9b64b3b004a6c9fad176e7ba2b446"
+
+@st.cache_resource
+def load_map():
+    path = "./city_map.json"
+    with open(path, 'r',encoding='utf-8') as f:
+        map_data = json.load(f)
+    
+    seq = map_data['seq']
+    tree = map_data['tree']
+    return tree,seq
+
+def load_static():
+    path = "./static.json"
+    with open(path, 'r',encoding='utf-8') as f:
+        static_data = json.load(f)
+    return static_data
+
+def save_static(static_data):
+    path = "./static.json"
+    with open(path, 'w',encoding='utf-8') as f:
+        json.dump(static_data,f,ensure_ascii=False,indent=4)
+    f.close()
+
+def make_map(choose,static_map):
+    city,block = choose
+    city_key = str(city)
+    block_key = str(block)
+
+    city_info = static_map[city_key]
+    block_info = static_map[block_key]
+
+    import numpy as np
+
+    data = [{"lat": city_info["loc"][1],"lon":city_info["loc"][0],"size":100,"color":np.random.rand(4).tolist()},
+            {"lat":block_info["loc"][1],"lon":block_info["loc"][0],"size":500,"color":np.random.rand(4).tolist()},
+            {"lat":block_info["loc"][1]+0.01,"lon":block_info["loc"][0]+0.01,"size":800,"color":np.random.rand(4).tolist()}
+            ]
+
+    return pd.DataFrame(data)
+
+
 
 def infer_uploaded_image(conf, model):
     """
@@ -13,7 +62,7 @@ def infer_uploaded_image(conf, model):
     :param model: An instance of the `YOLO class containing the YOLO model.
     :return: None
     """
-    source_img = st.sidebar.file_uploader(
+    source_img = st.file_uploader(
         label="选择一张图片...",
         type=("jpg", "jpeg", "png", 'bmp', 'webp')
     )
@@ -29,7 +78,7 @@ def infer_uploaded_image(conf, model):
                 use_column_width=True
             )
     if source_img:
-        if st.button("执行"):
+        if st.button("执行",use_container_width=True):
             with st.spinner("执行中..."):
                 """yolo预测返回的结果全在返回变量res中
                 这是一个ultralytics.yolo.engine.results.Results 类
@@ -68,6 +117,7 @@ def infer_uploaded_image(conf, model):
                                         else:
                                             labels_num_dict[labels[key]] = 1
                             st.write(labels_num_dict)
+                            return labels_num_dict
                     except Exception as ex:
                         st.write("没有选择待检测的图片!")
                         st.write(ex)
@@ -138,7 +188,7 @@ def infer_uploaded_video(conf, model):
     :param model: An instance of the `YOLOv8` class containing the YOLOv8 model.
     :return: None
     """
-    source_video = st.sidebar.file_uploader(
+    source_video = st.file_uploader(
         label="选择一个视频..."
     )
     #在页面中显示传入的原始视频
@@ -146,7 +196,7 @@ def infer_uploaded_video(conf, model):
         st.video(source_video)
 
     if source_video:
-        if st.button("执行"):
+        if st.button("执行",use_container_width=True):
             with st.spinner("执行中..."):
                 try:
                     tfile = tempfile.NamedTemporaryFile()
@@ -237,28 +287,56 @@ class VideoTransformer(VideoTransformerBase):
         # 将处理后的帧返回到视频流中
         return av.VideoFrame.from_ndarray(res_plotted, format="bgr24")
 
+
+
+def call_with_messages(text,pred):
+
+    template = '''
+    你是一名灾害防治专家，请你根据天气情况和灾害情况进行建议
+
+    当前天气情况：{text}
+
+    当前灾害情况：{pred}
+
+    '''
+
+    messages = [{"role":"user","content":template.format(text=text,pred=pred)}]
+
+    response = dashscope.Generation.call(
+        # dashscope.Generation.Models.qwen_turbo,
+        "qwen1.5-1.8b-chat",
+        messages=messages,
+        result_format='message',  # set the result to be "message" format.
+        temperature=0.95,
+        top_p=0.8,
+        max_tokens=200,
+    )
+    if response.status_code == HTTPStatus.OK:
+        res = response["output"]["choices"][0]["message"]["content"]
+    else:
+        res = '请求异常'
+    return res
+
+
 # 使用WebRTC进行网络摄像头视频流处理
-def infer_uploaded_webcam_http(conf, model):
-    # WebRTC配置
-    rtc_configuration = RTCConfiguration(
-        {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-    )
-
-    # 创建WebRTC流
-    webrtc_ctx = webrtc_streamer(
-        key="example",
-        video_transformer_factory=lambda: VideoTransformer(model, conf),
-        rtc_configuration=rtc_configuration,
-        media_stream_constraints={"video": True, "audio": False},
-        async_transform=True
-    )
-
-
- # if webrtc_ctx.video_transformer:
-    #     st.text("摄像头正在运行...")
-    #     if st.button("终止执行"):
-    #         webrtc_ctx.state.playing = False  # 停止视频流
-    # else:
-    #     st.text("点击下方按钮开始摄像头")
-    #     if st.button("开始执行"):
-    #         webrtc_ctx.state.playing = True  # 开始视频流
+# def infer_uploaded_webcam_http(conf, model):
+#     # WebRTC配置
+#     rtc_configuration = RTCConfiguration(
+#         {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+#     )
+#
+#     # 创建WebRTC流
+#     webrtc_ctx = webrtc_streamer(
+#         key="example",
+#         video_processor_factory=VideoProcessor,
+#         rtc_configuration={  # Add this line
+#             "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+#         }
+#     if webrtc_ctx.video_transformer:
+#         st.text("摄像头正在运行...")
+#         if st.button("终止执行"):
+#             webrtc_ctx.state.playing = False  # 停止视频流
+#     else:
+#         st.text("点击下方按钮开始摄像头")
+#         if st.button("开始执行"):
+#             webrtc_ctx.state.playing = True  # 开始视频流

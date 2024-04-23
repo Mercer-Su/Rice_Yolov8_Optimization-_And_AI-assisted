@@ -15,7 +15,7 @@ if root_path not in sys.path:
 #获取当前项目(工作目录)的相对路径
 ROOT = root_path.relative_to(Path.cwd())
 #数据源
-SOURCES_LIST = ["图像", "视频","摄像头","网络摄像头"]
+SOURCES_LIST = ["图像", "视频","摄像头"]#"网络摄像头"
 
 # 模型路径配置
 DETECTION_MODEL_DIR = ROOT / 'weights'
@@ -23,3 +23,15 @@ DETECTION_MODEL_DIR = ROOT / 'weights'
 #侧边栏模型选择列表
 DETECTION_MODEL_LIST = [
     "best.pt"]
+
+categories_map = {
+    "blasst": "稻瘟病",
+    "normal": "健康",
+    "blight": "枯萎病",
+    "brown spot": "褐斑病",
+    "dead heart": "枯心病",
+    "downy": "露珠病",
+    "false": "假烟病",
+    "sheath blight": "鞘病",
+    "streak": "叶纹病",
+    "tungro": "东南亚稻田病或水稻东格鲁病毒病"}
