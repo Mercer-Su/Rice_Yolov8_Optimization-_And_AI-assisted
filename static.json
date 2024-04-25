@@ -14640,7 +14640,8 @@
             "blight": 100,
             "brown spot": 30,
             "downy": 62,
-            "Brown Spot": 1
+            "Brown Spot": 1,
+            "False": 6
         }
     },
     "2092": {
@@ -15386,7 +15387,9 @@
             104.630231,
             28.760179
         ],
-        "static": {}
+        "static": {
+            "False": 1
+        }
     },
     "2195": {
         "loc": [

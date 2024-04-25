@@ -149,8 +149,6 @@ def main():
                 children_size = len(p['children'])
                 break
 
-
-
         map_static_data = make_map_static(cat,city_index,children_size,st.session_state.city_seq,st.session_state.static)
     
         c = map3d_with_bar3d(map_static_data,tag=2)
@@ -523,18 +521,21 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
             base_data.extend([[d[0],*d[1]] for i in range(max(d[1][-1]//scaling,1))])
 
         df = pd.DataFrame(base_data,columns = ["name","lon","lat","value"])
+        colors = [np.random.rand(4).tolist()]*len(df)
+        colors[0] = np.random.rand(4).tolist()
+        df["color"] = colors
 
         df_size = len(df)
 
         df["lat"] = df["lat"] + np.random.randn(df_size)/50
         df["lon"] = df["lon"] + np.random.randn(df_size)/50
 
-        st.map(df,longitude="lon",latitude="lat",size="value",zoom=10)
+        st.map(df,longitude="lon",latitude="lat",size="value",color="color",zoom=10)
 
 
 def make_map_static(cat,city_index,children_size,city_seq,static):
     city_key = str(city_index)
-    data = [(city_seq[city_index],[*static[city_key]["loc"],1e-5])]
+    data = [(city_seq[city_index],[*static[city_key]["loc"],10])]
     for p in range(city_index+1,city_index+children_size):
         p_key = str(p)
         p_info = static[p_key]
