@@ -533,8 +533,9 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
 
 
 def make_map_static(cat,city_index,children_size,city_seq,static):
-    data = []
-    for p in range(city_index,city_index+children_size):
+    city_key = str(city_index)
+    data = [(city_seq[city_index],[*static[city_key]["loc"],1e-5])]
+    for p in range(city_index+1,city_index+children_size):
         p_key = str(p)
         p_info = static[p_key]
         if cat in p_info["static"]:
