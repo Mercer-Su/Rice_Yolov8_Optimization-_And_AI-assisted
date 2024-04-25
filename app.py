@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 import config
-from utils import load_model, infer_uploaded_image, infer_uploaded_video, infer_uploaded_webcam,load_map,load_static,make_map,call_with_messages,save_static
+from utils import load_model, infer_uploaded_image, infer_uploaded_webcam,load_map,load_static,make_map,call_with_messages,save_static,infer_uploaded_video
 
 import random
 import datetime
@@ -97,11 +97,11 @@ def main():
 
         source_img = None
         predict = None
-        if source_selectbox == config.SOURCES_LIST[2]:  # 摄像头
+        if source_selectbox == config.SOURCES_LIST[2]:  # 视频
             predict = infer_uploaded_webcam(confidence, model)
         elif source_selectbox == config.SOURCES_LIST[0]:  # 图片
             predict = infer_uploaded_image(confidence, model)
-        elif source_selectbox == config.SOURCES_LIST[1]:  # 视频
+        elif source_selectbox == config.SOURCES_LIST[1]:# 摄像头拍照
             predict = infer_uploaded_video(confidence, model)
         # elif source_selectbox == config.SOURCES_LIST[3]:  # 网络摄像头
         #     infer_uploaded_webcam_http(confidence, model)
@@ -158,9 +158,7 @@ def main():
         c = map3d_with_bar3d(map_static_data,tag=2)
 
         # components.html(c,height=500,width=700)
-    # with predict_region:
-        make_categories_pie(city_choose,st.session_state.static)
-
+    
 
     # color = st.sidebar.color_picker('选择你的偏好颜色', '#520520')
     # st.sidebar.write('当前的颜色是', color)
@@ -234,6 +232,13 @@ def main():
             st.text_area("AI决策防治:",ai_call_message, height=350)
 
             save_static(st.session_state.static)
+            
+    if predict:
+        with show_region:
+            make_categories_pie(city_choose,st.session_state.static)
+    else:
+        with predict_region:
+            make_categories_pie(city_choose,st.session_state.static)
 
     # st.markdown(f'### {chart} 图表')
     # df = get_chart_data(chart, st.session_state.my_random)

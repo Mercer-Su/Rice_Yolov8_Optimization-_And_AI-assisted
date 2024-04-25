@@ -55,17 +55,21 @@ def make_map(choose,static_map):
 
 
 
-def infer_uploaded_image(conf, model):
+def infer_uploaded_image(conf, model,source_img=None):
     """
     执行图片推理
     :param conf: Confidence of YOLO model
     :param model: An instance of the `YOLO class containing the YOLO model.
     :return: None
     """
-    source_img = st.file_uploader(
-        label="选择一张图片...",
-        type=("jpg", "jpeg", "png", 'bmp', 'webp')
-    )
+    if not source_img:
+        source_img = st.file_uploader(
+            label="选择一张图片...",
+            type=("jpg", "jpeg", "png", 'bmp', 'webp')
+        )
+    
+
+
     #页面划分一个区域用于显示检测前后的图片（一行两列）
     col1, col2 = st.columns(2)
     with col1:
@@ -231,30 +235,34 @@ def infer_uploaded_webcam(conf, model):
     :param model: An instance of the `YOLO` class containing the YOLO model.
     :return: None
     """
-    try:
-        flag = st.button(
-            label="终止执行"
-        )
-        vid_cap = cv2.VideoCapture(0)  #调用本地摄像头
-        #页面创建两个空容器一个实时播放画面一个实时展示信息
-        st_frame = st.empty()
-        st_text=st.empty()
-        while not flag:
-            success, image = vid_cap.read()
-            if success:
-                #调用方法逐帧预测
-                _display_detected_frames(
-                    conf,
-                    model,
-                    st_frame,
-                    st_text,
-                    image
-                )
-            else:
-                vid_cap.release()
-                break
-    except Exception as e:
-        st.error(f"Error loading video: {str(e)}")
+    img = st.camera_input("拍照")
+    if img:
+        predict= infer_uploaded_image(conf, model, img)
+        return predict
+    # try:
+    #     flag = st.button(
+    #         label="终止执行"
+    #     )
+    #     vid_cap = cv2.VideoCapture(0)  #调用本地摄像头
+    #     #页面创建两个空容器一个实时播放画面一个实时展示信息
+    #     st_frame = st.empty()
+    #     st_text=st.empty()
+    #     while not flag:
+    #         success, image = vid_cap.read()
+    #         if success:
+    #             #调用方法逐帧预测
+    #             _display_detected_frames(
+    #                 conf,
+    #                 model,
+    #                 st_frame,
+    #                 st_text,
+    #                 image
+    #             )
+    #         else:
+    #             vid_cap.release()
+    #             break
+    # except Exception as e:
+    #     st.error(f"Error loading video: {str(e)}")
 
 #         def transform(self, frame):
 #             img = frame.to_ndarray(format="bgr24")  # 将帧转换为ndarray格式
