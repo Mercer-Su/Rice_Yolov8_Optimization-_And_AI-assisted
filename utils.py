@@ -1,8 +1,10 @@
+from ast import Return
 from pyexpat.errors import messages
 from ultralytics import YOLO
 from http import HTTPStatus
 import cv2
 from PIL import Image
+import numpy as np
 import tempfile
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration
 import av
@@ -55,76 +57,81 @@ def make_map(choose,static_map):
 
 
 
-def infer_uploaded_image(conf, model,source_img=None):
+def infer_uploaded_image(conf, model,source_img=None,ban_btn=False):
     """
     执行图片推理
     :param conf: Confidence of YOLO model
     :param model: An instance of the `YOLO class containing the YOLO model.
     :return: None
     """
-    if not source_img:
+    if source_img is None:
         source_img = st.file_uploader(
             label="选择一张图片...",
             type=("jpg", "jpeg", "png", 'bmp', 'webp')
         )
-    
-
 
     #页面划分一个区域用于显示检测前后的图片（一行两列）
     col1, col2 = st.columns(2)
     with col1:
-        if source_img:
-            uploaded_image = Image.open(source_img)
+        if source_img is not None:
+            if isinstance(source_img, np.ndarray):
+                uploaded_image = Image.fromarray(source_img)
+            else:
+                uploaded_image = Image.open(source_img)
             # 将原始图片显示在页面中(col1位置)
             st.image(
                 image=source_img,
                 caption="上传图片",
                 use_column_width=True
             )
-    if source_img:
-        if st.button("执行",use_container_width=True):
-            with st.spinner("执行中..."):
-                """yolo预测返回的结果全在返回变量res中
-                这是一个ultralytics.yolo.engine.results.Results 类
-                该类包含了检测、分割、关键点检测、分类任务的所有预测信息
-                Results类中names属性:类别标签
-                boxes属性:目标检测信息
-                masks：实例分割信息
-                probs：图像分类信息
-                keypoints：人体关键点检测信息
-                具体信息可以参看 ultralytics.yolo.engine.results 路径中的Results类
-                """
-                res = model.predict(uploaded_image,
-                                    conf=conf)
-                print(res)
-                labels=res[0].names
-                print(labels)
-                boxes = res[0].boxes
-                #关于下面的plot()见  本类中 _display_detected_frames方法对它解释(在下面)
-                res_plotted = res[0].plot()[:, :, ::-1]
-                print(type(res_plotted))
-                with col2:
-                    st.image(res_plotted,
-                             caption="Detected Image",
-                             use_column_width=True)
-                    try:
-                        #统计一张图片中Label 个数及数量 显示在前端页面中
-                        with st.expander("检测结果",expanded=False):
-                            labels_num_dict={}
-                            for box in boxes:
-                                print(box)
-                                lable_index=box.cls.cpu().detach().numpy()[0].astype(int)
-                                for key in labels.keys():
-                                    if int(lable_index)==key:
-                                        if labels[key] in labels_num_dict:
-                                            labels_num_dict[labels[key]]+=1
-                                        else:
-                                            labels_num_dict[labels[key]] = 1
-                            st.write(labels_num_dict)
-                            return labels_num_dict
-                    except Exception as ex:
-                        st.write("没有选择待检测的图片!")
-                        st.write(ex)
+
+    if source_img is not None:
+        
+        if not ban_btn:
+            st.button("执行",use_container_width=True)
+
+        with st.spinner("执行中..."):
+            """yolo预测返回的结果全在返回变量res中
+            这是一个ultralytics.yolo.engine.results.Results 类
+            该类包含了检测、分割、关键点检测、分类任务的所有预测信息
+            Results类中names属性:类别标签
+            boxes属性:目标检测信息
+            masks：实例分割信息
+            probs：图像分类信息
+            keypoints：人体关键点检测信息
+            具体信息可以参看 ultralytics.yolo.engine.results 路径中的Results类
+            """
+            res = model.predict(uploaded_image,
+                                conf=conf)
+            print(res)
+            labels=res[0].names
+            print(labels)
+            boxes = res[0].boxes
+            #关于下面的plot()见  本类中 _display_detected_frames方法对它解释(在下面)
+            res_plotted = res[0].plot()[:, :, ::-1]
+            print(type(res_plotted))
+            with col2:
+                st.image(res_plotted,
+                        caption="Detected Image",
+                        use_column_width=True)
+                try:
+                    #统计一张图片中Label 个数及数量 显示在前端页面中
+                    with st.expander("检测结果",expanded=False):
+                        labels_num_dict={}
+                        for box in boxes:
+                            print(box)
+                            lable_index=box.cls.cpu().detach().numpy()[0].astype(int)
+                            for key in labels.keys():
+                                if int(lable_index)==key:
+                                    if labels[key] in labels_num_dict:
+                                        labels_num_dict[labels[key]]+=1
+                                    else:
+                                        labels_num_dict[labels[key]] = 1
+                        return labels_num_dict
+                except Exception as ex:
+                    st.write("没有选择待检测的图片!")
+                    st.write(ex)
+                    
 
 def _display_detected_frames(conf, model, st_frame,st_text, image):
     """
@@ -199,33 +206,35 @@ def infer_uploaded_video(conf, model):
     if source_video:
         st.video(source_video)
 
-    if source_video:
-        if st.button("执行",use_container_width=True):
-            with st.spinner("执行中..."):
-                try:
-                    tfile = tempfile.NamedTemporaryFile()
-                    tfile.write(source_video.read())
-                    vid_cap = cv2.VideoCapture(
-                        tfile.name)
 
-                    # 页面创建两个空容器一个实时播放画面一个实时展示信息
-                    st_frame = st.empty()
-                    st_text=st.empty()
-                    while (vid_cap.isOpened()):
-                        success, image = vid_cap.read()
-                        if success:
-                            # 调用方法逐帧预测
-                            _display_detected_frames(conf,
-                                                     model,
-                                                     st_frame,
-                                                     st_text,
-                                                     image
-                                                     )
-                        else:
-                            vid_cap.release()
-                            break
-                except Exception as e:
-                    st.error(f"Error loading video: {e}")
+    if source_video:
+        # try:
+        tfile = tempfile.NamedTemporaryFile()
+        tfile.write(source_video.read())
+        vid_cap = cv2.VideoCapture(
+            tfile.name)
+
+        # 页面创建两个空容器一个实时播放画面一个实时展示信息
+        # st_frame = st.empty()
+        # st_text=st.empty()
+        while (vid_cap.isOpened()):
+            success, image = vid_cap.read()
+            if success:
+                # 调用方法逐帧预测
+                # _display_detected_frames(conf,
+                #                          model,
+                #                          st_frame,
+                #                          st_text,
+                #                          image
+                #                          )
+                predict = infer_uploaded_image(conf, model, image[:,:,::-1],True)
+                if predict:
+                    return predict
+            else:
+                vid_cap.release()
+                break
+        # except Exception as e:
+        #     st.error(f"Error loading video: {e}")
 
 
 def infer_uploaded_webcam(conf, model):
@@ -237,8 +246,9 @@ def infer_uploaded_webcam(conf, model):
     """
     img = st.camera_input("拍照")
     if img:
-        predict= infer_uploaded_image(conf, model, img)
+        predict = infer_uploaded_image(conf, model, img)
         return predict
+    
     # try:
     #     flag = st.button(
     #         label="终止执行"

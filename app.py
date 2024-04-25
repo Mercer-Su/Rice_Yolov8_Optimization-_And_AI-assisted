@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 import config
-from utils import load_model, infer_uploaded_image, infer_uploaded_webcam,load_map,load_static,make_map,call_with_messages,save_static,infer_uploaded_video
+from utils import infer_uploaded_video, load_model, infer_uploaded_image,infer_uploaded_video,infer_uploaded_webcam,load_map,load_static,make_map,call_with_messages,save_static
 
 import random
 import datetime
@@ -97,14 +97,12 @@ def main():
 
         source_img = None
         predict = None
-        if source_selectbox == config.SOURCES_LIST[2]:  # 视频
+        if source_selectbox == config.SOURCES_LIST[1]:  # 摄像头
             predict = infer_uploaded_webcam(confidence, model)
         elif source_selectbox == config.SOURCES_LIST[0]:  # 图片
             predict = infer_uploaded_image(confidence, model)
-        elif source_selectbox == config.SOURCES_LIST[1]:# 摄像头拍照
+        elif source_selectbox == config.SOURCES_LIST[2]:  # 
             predict = infer_uploaded_video(confidence, model)
-        # elif source_selectbox == config.SOURCES_LIST[3]:  # 网络摄像头
-        #     infer_uploaded_webcam_http(confidence, model)
         else:
             st.error("目前仅支持 '图片' '视频' '本地摄像头' ")
 
