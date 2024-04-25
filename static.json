@@ -14403,7 +14403,9 @@
             107.394905,
             29.703652
         ],
-        "static": {}
+        "static": {
+            "Blasst": 1
+        }
     },
     "2059": {
         "loc": [
@@ -14480,7 +14482,9 @@
             106.519423,
             29.381919
         ],
-        "static": {}
+        "static": {
+            "Brown Spot": 1
+        }
     },
     "2070": {
         "loc": [
@@ -14635,10 +14639,15 @@
             30.657689
         ],
         "static": {
-            "blasst": 26,
+            "blasst": 30,
             "normal": 12,
-            "blight": 63,
-            "brown spot": 35
+            "blight": 65,
+            "brown spot": 35,
+            "Downy": 1,
+            "False": 3,
+            "Brown Spot": 2,
+            "Blasst": 4,
+            "Normal": 3
         }
     },
     "2092": {
