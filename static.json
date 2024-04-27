@@ -14635,13 +14635,11 @@
             30.657689
         ],
         "static": {
-            "blasst": 50,
-            "normal": 25,
-            "blight": 100,
-            "brown spot": 30,
-            "downy": 62,
-            "Brown Spot": 1,
-            "False": 6
+            "Blasst": 50,
+            "Normal": 25,
+            "Blight": 100,
+            "Brown spot": 30,
+            "Downy": 62
         }
     },
     "2092": {
@@ -14650,11 +14648,11 @@
             30.667648
         ],
         "static": {
-            "blasst": 150,
-            "normal": 125,
-            "blight": 100,
-            "brown spot": 130,
-            "downy": 622
+            "Blasst": 150,
+            "Normal": 125,
+            "Blight": 100,
+            "Brown Spot": 130,
+            "Downy": 622
         }
     },
     "2093": {
@@ -14663,11 +14661,11 @@
             30.692058
         ],
         "static": {
-            "blasst": 500,
-            "normal": 525,
-            "blight": 600,
-            "brown spot": 130,
-            "downy": 62
+            "Blasst": 50,
+            "Normal": 525,
+            "Blight": 600,
+            "Brown Spot": 130,
+            "Downy": 62
         }
     },
     "2094": {
@@ -14676,11 +14674,11 @@
             30.630862
         ],
         "static": {
-            "blasst": 250,
-            "normal": 125,
-            "blight": 600,
-            "brown spot": 130,
-            "downy": 692
+            "Blasst": 250,
+            "Normal": 125,
+            "Blight": 600,
+            "Brown Spot": 130,
+            "Downy": 692
         }
     },
     "2095": {
@@ -14689,11 +14687,11 @@
             30.660275
         ],
         "static": {
-            "blasst": 289,
-            "normal": 625,
-            "blight": 200,
-            "brown spot": 130,
-            "downy": 63
+            "Blasst": 289,
+            "Normal": 625,
+            "Nlight": 200,
+            "Nrown Spot": 130,
+            "Downy": 63
         }
     },
     "2096": {
@@ -14855,7 +14853,9 @@
             101.715134,
             26.580887
         ],
-        "static": {}
+        "static": {
+            "Blasst": 1
+        }
     },
     "2119": {
         "loc": [
@@ -15788,14 +15788,19 @@
             102.233225,
             29.912482
         ],
-        "static": {}
+        "static": {
+            "False": 1,
+            "Dead Heart": 1
+        }
     },
     "2252": {
         "loc": [
             101.886125,
             30.877083
         ],
-        "static": {}
+        "static": {
+            "False": 2
+        }
     },
     "2253": {
         "loc": [
