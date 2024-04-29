@@ -14634,13 +14634,7 @@
             104.080989,
             30.657689
         ],
-        "static": {
-            "Blasst": 50,
-            "Normal": 25,
-            "Blight": 100,
-            "Brown spot": 30,
-            "Downy": 62
-        }
+        "static": {}
     },
     "2092": {
         "loc": [
@@ -14660,39 +14654,21 @@
             104.043487,
             30.692058
         ],
-        "static": {
-            "Blasst": 50,
-            "Normal": 525,
-            "Blight": 600,
-            "Brown Spot": 130,
-            "Downy": 62
-        }
+        "static": {}
     },
     "2094": {
         "loc": [
             104.05167,
             30.630862
         ],
-        "static": {
-            "Blasst": 250,
-            "Normal": 125,
-            "Blight": 600,
-            "Brown Spot": 130,
-            "Downy": 692
-        }
+        "static": {}
     },
     "2095": {
         "loc": [
             104.103077,
             30.660275
         ],
-        "static": {
-            "Blasst": 289,
-            "Normal": 625,
-            "Nlight": 200,
-            "Nrown Spot": 130,
-            "Downy": 63
-        }
+        "static": {}
     },
     "2096": {
         "loc": [
@@ -14769,7 +14745,13 @@
             103.941173,
             30.985161
         ],
-        "static": {}
+        "static": {
+            "Blasst": 501,
+            "Normal": 525,
+            "Blight": 600,
+            "Brown Spot": 130,
+            "Downy": 620
+        }
     },
     "2107": {
         "loc": [

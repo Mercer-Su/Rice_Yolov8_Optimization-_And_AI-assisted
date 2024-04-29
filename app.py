@@ -138,7 +138,7 @@ def main():
     #     chart = st.selectbox('选择你想查看的图表', charts_mapping.keys(),
     #                              index=st.session_state.random_chart_index)
     with show_region:
-        city_choose = sac.cascader(st.session_state.city_map,index=[2090,2091],return_index=True,search=True)
+        city_choose = sac.cascader(st.session_state.city_map,index=[2090,2106],return_index=True,search=True)
         city_index = city_choose[0]
         city = st.session_state.city_seq[city_index]
 
@@ -169,6 +169,19 @@ def main():
         col4.metric('湿度', forecastToday['humidity'])
         col5.metric('风向', forecastToday['wind'])
         col6.metric('预测更新时间', forecastToday['updateTime'])
+        st.markdown(
+            """
+            <style>
+            body{
+                if(weather=="多云"):
+                    background-image:url('https://i.imgur.com')
+            }
+            </style>
+            """
+
+        )
+
+
         c1 = (
             Line()
             .add_xaxis(xaxis_data=df_forecastHours.index.to_list())
@@ -516,7 +529,7 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
         components.html(ditu,height=500,width=700)
     if tag==2:
         base_data = []
-        scaling = 10
+        scaling = 50
         for d in example_data:
             base_data.extend([[d[0],*d[1]] for i in range(max(d[1][-1]//scaling,1))])
 

@@ -206,7 +206,6 @@ def infer_uploaded_video(conf, model):
     if source_video:
         st.video(source_video)
 
-
     if source_video:
         # try:
         tfile = tempfile.NamedTemporaryFile()
@@ -315,7 +314,9 @@ def call_with_messages(text,pred):
     当前天气情况：{text}
 
     当前灾害情况：{pred}
-
+    
+    请给出详细的治理方案
+    
     '''
 
     messages = [{"role":"user","content":template.format(text=text,pred=pred)}]
