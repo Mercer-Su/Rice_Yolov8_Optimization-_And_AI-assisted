@@ -150,36 +150,67 @@ def main():
                 break
 
         map_static_data = make_map_static(cat,city_index,children_size,st.session_state.city_seq,st.session_state.static)
-    
+
         c = map3d_with_bar3d(map_static_data,tag=2)
 
         # components.html(c,height=500,width=700)
-    
+
 
     # color = st.sidebar.color_picker('选择你的偏好颜色', '#520520')
     # st.sidebar.write('当前的颜色是', color)
+    def set_background(image_file):
+        with open(image_file, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url(data:image/{"jpg"};base64,{encoded_string});
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+    css = """
+    <style>
+    body {
+        color: black; /* 设置字体颜色 */
+        text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; /* 添加白色描边 */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
 
     with st.container():
         st.markdown(f'### {city} 天气预测')
         forecastToday, df_forecastHours, df_forecastDays = get_city_weather(st.session_state.city_mapping[city])
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric('天气情况', forecastToday['weather'])
+        if forecastToday['weather'] == "晴":
+            set_background(r".\log\sunny.jpg")
+        elif forecastToday['weather'] == "多云":
+            set_background(r".\log\cloudy.jpg")
+        elif forecastToday['weather'] == "阴":
+            set_background(r".\log\ccloudy.jpg")
+        elif forecastToday['weather'] == "小雨" or forecastToday['weather'] == "中雨" or forecastToday[
+            'weather'] == "大雨":
+            set_background(r".\log\rainy.jpg")
+        elif forecastToday['weather'] == "小雪" or forecastToday['weather'] == "中雪" or forecastToday[
+            'weather'] == "大雪":
+            set_background(r".\snowy.jpg")
         col2.metric('当前温度', forecastToday['temp'])
         col3.metric('当前体感温度', forecastToday['realFeel'])
         col4.metric('湿度', forecastToday['humidity'])
         col5.metric('风向', forecastToday['wind'])
         col6.metric('预测更新时间', forecastToday['updateTime'])
-        st.markdown(
-            """
-            <style>
-            body{
-                if(weather=="多云"):
-                    background-image:url('https://i.imgur.com')
-            }
-            </style>
-            """
 
-        )
 
 
         c1 = (
@@ -200,9 +231,9 @@ def main():
         c2 = (
             Line()
             .add_xaxis(xaxis_data=df_forecastDays.index.to_list())
-            .add_yaxis(series_name="High Temperature", y_axis=df_forecastDays.Temperature.apply(
+            .add_yaxis(series_name="最高温度", y_axis=df_forecastDays.Temperature.apply(
                 lambda x: int(x.replace('°C', '').split('~')[1])).values.tolist())
-            .add_yaxis(series_name="Low Temperature", y_axis=df_forecastDays.Temperature.apply(
+            .add_yaxis(series_name="最低温度", y_axis=df_forecastDays.Temperature.apply(
                 lambda x: int(x.replace('°C', '').split('~')[0])).values.tolist())
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="7 Days Forecast"),
@@ -241,7 +272,7 @@ def main():
             st.text_area("AI决策防治:",ai_call_message, height=350)
 
             save_static(st.session_state.static)
-            
+
     if predict:
         with show_region:
             make_categories_pie(city_choose,st.session_state.static)
@@ -401,14 +432,14 @@ def get_city_weather(cityId):
         weather=result['condition']['weather'],
         wind=f"{result['condition']['windDir']}{result['condition']['windLevel']}级",
         updateTime=(datetime.datetime.fromtimestamp(result['condition']['updateTime']) + datetime.timedelta(
-            hours=8)).strftime('%H:%M:%S')
+            hours=0)).strftime('%H:%M:%S')
     )
 
     # 24 hours forecast
     forecastHours = []
     for i in result['forecastHours']['forecastHour']:
         tmp = {}
-        tmp['PredictTime'] = (datetime.datetime.fromtimestamp(i['predictTime']) + datetime.timedelta(hours=8)).strftime(
+        tmp['PredictTime'] = (datetime.datetime.fromtimestamp(i['predictTime']) + datetime.timedelta(hours=0)).strftime(
             '%H:%M')
         tmp['Temperature'] = i['temp']
         tmp['Body Temperature'] = i['realFeel']
@@ -423,7 +454,7 @@ def get_city_weather(cityId):
     day_format = {1: '昨天', 0: '今天', -1: '明天', -2: '后天'}
     for i in result['forecastDays']['forecastDay']:
         tmp = {}
-        now = datetime.datetime.fromtimestamp(i['predictDate']) + datetime.timedelta(hours=8)
+        now = datetime.datetime.fromtimestamp(i['predictDate']) + datetime.timedelta(hours=0)
         diff = (st.session_state.date_time - now).days
         festival = i['festival']
         tmp['PredictDate'] = (day_format[diff] if diff in day_format else now.strftime('%m/%d')) + (
@@ -491,7 +522,7 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
                 #     color="white",
                 #     font_size=25,
                 #     ),
-        
+
                 light_opts=opts.Map3DLightOpts(
                     main_color="white",
                     main_intensity=1.0,
@@ -518,7 +549,7 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
                         color="white",
                         font_size=15,
                     ),
-                
+
             )
             .set_global_opts(title_opts=opts.TitleOpts(title="分布情况"),
                     visualmap_opts=opts.VisualMapOpts(is_show=False),
