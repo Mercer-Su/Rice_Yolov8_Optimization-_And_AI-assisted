@@ -194,17 +194,17 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric('天气情况', forecastToday['weather'])
         if forecastToday['weather'] == "晴":
-            set_background(r"log\sunny.jpg")
+            set_background(r"sunny.jpg")
         elif forecastToday['weather'] == "多云":
-            set_background(r"log\cloudy.jpg")
+            set_background(r"cloudy.jpg")
         elif forecastToday['weather'] == "阴":
-            set_background(r"log\ccloudy.jpg")
+            set_background(r"ccloudy.jpg")
         elif forecastToday['weather'] == "小雨" or forecastToday['weather'] == "中雨" or forecastToday[
             'weather'] == "大雨":
-            set_background(r"log\rainy.jpg")
+            set_background(r"rainy.jpg")
         elif forecastToday['weather'] == "小雪" or forecastToday['weather'] == "中雪" or forecastToday[
             'weather'] == "大雪":
-            set_background(r"log\snowy.jpg")
+            set_background(r"snowy.jpg")
         col2.metric('当前温度', forecastToday['temp'])
         col3.metric('当前体感温度', forecastToday['realFeel'])
         col4.metric('湿度', forecastToday['humidity'])
