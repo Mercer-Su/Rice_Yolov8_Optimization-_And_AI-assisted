@@ -139,5 +139,6 @@ wcwidth==0.2.13
 webencodings==0.5.1
 yarg==0.1.9
 yarl==1.9.4
-              
-opencv-python-headless 
+libgl1
+libglib2.0-0      
+opencv-python>=4.1.2
