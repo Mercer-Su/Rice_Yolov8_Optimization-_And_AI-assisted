@@ -26,7 +26,7 @@ DETECTION_MODEL_LIST = [
 
 categories_map = {
     "Blasst": "稻瘟病",
-    "Normal": "健康",
+    "Normal": "其他",
     "Blight": "枯萎病",
     "Brown Spot": "褐斑病",
     "Dead Heart": "枯心病",
