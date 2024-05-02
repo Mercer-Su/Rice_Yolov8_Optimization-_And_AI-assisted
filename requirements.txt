@@ -17,7 +17,5 @@ streamlit_antd_components
 streamlit_echarts
 streamlit_webrtc
 torch
-
-cv2
 ultralytics
 opencv-python-headless
