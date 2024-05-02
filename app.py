@@ -138,7 +138,7 @@ def main():
     #     chart = st.selectbox('选择你想查看的图表', charts_mapping.keys(),
     #                              index=st.session_state.random_chart_index)
     with show_region:
-        city_choose = sac.cascader(st.session_state.city_map,index=[2090,2106],return_index=True,search=True)
+        city_choose = sac.cascader(st.session_state.city_map,index=[2090,2109],return_index=True,search=True)
         city_index = city_choose[0]
         city = st.session_state.city_seq[city_index]
 
@@ -194,17 +194,17 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric('天气情况', forecastToday['weather'])
         if forecastToday['weather'] == "晴":
-            set_background(r"sunny.jpg")
+            set_background(r"log\sunny.jpg")
         elif forecastToday['weather'] == "多云":
-            set_background(r"cloudy.jpg")
+            set_background(r"log\cloudy.jpg")
         elif forecastToday['weather'] == "阴":
-            set_background(r"ccloudy.jpg")
+            set_background(r"log\ccloudy.jpg")
         elif forecastToday['weather'] == "小雨" or forecastToday['weather'] == "中雨" or forecastToday[
             'weather'] == "大雨":
-            set_background(r"rainy.jpg")
+            set_background(r"log\rainy.jpg")
         elif forecastToday['weather'] == "小雪" or forecastToday['weather'] == "中雪" or forecastToday[
             'weather'] == "大雪":
-            set_background(r"snowy.jpg")
+            set_background(r"log\snowy.jpg")
         col2.metric('当前温度', forecastToday['temp'])
         col3.metric('当前体感温度', forecastToday['realFeel'])
         col4.metric('湿度', forecastToday['humidity'])
@@ -560,13 +560,21 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
         components.html(ditu,height=500,width=700)
     if tag==2:
         base_data = []
-        scaling = 50
+        scaling = 1000
         for d in example_data:
             base_data.extend([[d[0],*d[1]] for i in range(max(d[1][-1]//scaling,1))])
+        for idx, sublist in enumerate(base_data):
+            base_data[idx][-1] *= 0.035
 
-        df = pd.DataFrame(base_data,columns = ["name","lon","lat","value"])
-        colors = [np.random.rand(4).tolist()]*len(df)
-        colors[0] = np.random.rand(4).tolist()
+        df = pd.DataFrame(base_data, columns=["name", "lon", "lat", "value"])
+
+        # 创建一个固定的颜色列表
+        colors = [[0.5, 0, 0, 0.5]] * len(df)
+
+        # 将第一个点的颜色设置为不同的颜色
+        first_point_color = [0.1, 0.8, 0.3, 1.0]
+        colors[0] = first_point_color
+
         df["color"] = colors
 
         df_size = len(df)
