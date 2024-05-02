@@ -140,5 +140,5 @@ webencodings==0.5.1
 yarg==0.1.9
 yarl==1.9.4
 
-libglib2.0-0      
+
 opencv-python>=4.1.2
