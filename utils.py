@@ -315,7 +315,7 @@ def call_with_messages(text,pred):
 
     当前灾害情况：{pred}
     
-    请给出详细的治理方案
+    请结合天气情况和灾害情况只给出不超过300字的水稻的治理方案
     
     '''
 
@@ -328,7 +328,7 @@ def call_with_messages(text,pred):
         result_format='message',  # set the result to be "message" format.
         temperature=0.95,
         top_p=0.8,
-        max_tokens=200,
+        max_tokens=500,
     )
     if response.status_code == HTTPStatus.OK:
         res = response["output"]["choices"][0]["message"]["content"]
