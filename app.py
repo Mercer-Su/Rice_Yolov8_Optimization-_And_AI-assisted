@@ -1,8 +1,8 @@
 from pathlib import Path
 
-
 import config
-from utils import infer_uploaded_video, load_model, infer_uploaded_image,infer_uploaded_video,infer_uploaded_webcam,load_map,load_static,make_map,call_with_messages,save_static
+from utils import infer_uploaded_video, load_model, infer_uploaded_image, infer_uploaded_video, infer_uploaded_webcam, \
+    load_map, load_static, make_map, call_with_messages, save_static
 
 import random
 import datetime
@@ -32,7 +32,6 @@ import warnings
 
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer
-
 
 # 忽略特定类型的警告
 warnings.filterwarnings("ignore", message="st.cache is deprecated", category=DeprecationWarning)
@@ -124,7 +123,7 @@ def main():
             hours=0)  # Streamlit Cloud的时区是UTC，加8小时即北京时间
         st.session_state.random_chart_index = random.choice(range(len(charts_mapping)))
         st.session_state.my_random = MyRandom(random.randint(1, 1000000))
-        st.session_state.city_mapping,_ = get_city_mapping()
+        st.session_state.city_mapping, _ = get_city_mapping()
         st.session_state.static = load_static()
         st.session_state.city_map, st.session_state.city_seq = load_map()
         st.balloons()
@@ -138,23 +137,23 @@ def main():
     #     chart = st.selectbox('选择你想查看的图表', charts_mapping.keys(),
     #                              index=st.session_state.random_chart_index)
     with show_region:
-        city_choose = sac.cascader(st.session_state.city_map,index=[2090,2109],return_index=True,search=True)
+        city_choose = sac.cascader(st.session_state.city_map, index=[2090, 2109], return_index=True, search=True)
         city_index = city_choose[0]
         city = st.session_state.city_seq[city_index]
 
-        cat = st.selectbox("灾害类别:",config.categories_map,format_func=config.categories_map.get)
+        cat = st.selectbox("灾害类别:", config.categories_map, format_func=config.categories_map.get)
 
         for p in st.session_state.city_map:
             if p['label'] == st.session_state.city_seq[city_index]:
                 children_size = len(p['children'])
                 break
 
-        map_static_data = make_map_static(cat,city_index,children_size,st.session_state.city_seq,st.session_state.static)
+        map_static_data = make_map_static(cat, city_index, children_size, st.session_state.city_seq,
+                                          st.session_state.static)
 
-        c = map3d_with_bar3d(map_static_data,tag=2)
+        c = map3d_with_bar3d(map_static_data, tag=2)
 
         # components.html(c,height=500,width=700)
-
 
     # color = st.sidebar.color_picker('选择你的偏好颜色', '#520520')
     # st.sidebar.write('当前的颜色是', color)
@@ -194,24 +193,26 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric('天气情况', forecastToday['weather'])
         if forecastToday['weather'] == "晴":
-            set_background(r"sunny.jpg")
+            set_background(r"log\sunny.jpg")
         elif forecastToday['weather'] == "多云":
-            set_background(r"cloudy.jpg")
+            set_background(r"log\cloudy.jpg")
         elif forecastToday['weather'] == "阴":
-            set_background(r"ccloudy.jpg")
+            set_background(r"log\ccloudy.jpg")
         elif forecastToday['weather'] == "小雨" or forecastToday['weather'] == "中雨" or forecastToday[
             'weather'] == "大雨":
-            set_background(r"rainy.jpg")
+            set_background(r"log\rainy.jpg")
         elif forecastToday['weather'] == "小雪" or forecastToday['weather'] == "中雪" or forecastToday[
             'weather'] == "大雪":
-            set_background(r"snowy.jpg")
+            set_background(r"log\snowy.jpg")
+        elif forecastToday['weather'] == "雾" or forecastToday['weather'] == "霾":
+            set_background(r'log\fog.jpg')
+        else:
+            set_background(r"log\cloudy.jpg")
         col2.metric('当前温度', forecastToday['temp'])
         col3.metric('当前体感温度', forecastToday['realFeel'])
         col4.metric('湿度', forecastToday['humidity'])
         col5.metric('风向', forecastToday['wind'])
         col6.metric('预测更新时间', forecastToday['updateTime'])
-
-
 
         c1 = (
             Line()
@@ -268,17 +269,17 @@ def main():
                 else:
                     st.session_state.static[key_index]["static"][p] += 1
             predict_desc = ",".join(predict_items)
-            ai_call_message = call_with_messages(str(forecastToday),predict_desc)
-            st.text_area("AI决策防治:",ai_call_message, height=350)
+            ai_call_message = call_with_messages(str(forecastToday), predict_desc)
+            st.text_area("AI决策防治:", ai_call_message, height=350)
 
             save_static(st.session_state.static)
 
     if predict:
         with show_region:
-            make_categories_pie(city_choose,st.session_state.static)
+            make_categories_pie(city_choose, st.session_state.static)
     else:
         with predict_region:
-            make_categories_pie(city_choose,st.session_state.static)
+            make_categories_pie(city_choose, st.session_state.static)
 
     # st.markdown(f'### {chart} 图表')
     # df = get_chart_data(chart, st.session_state.my_random)
@@ -382,7 +383,6 @@ def my_hash_func(my_random):
 #         p.close()
 
 
-
 #     elif chart == 'PyEchart':
 #         options = {
 #             "xAxis": {
@@ -479,28 +479,30 @@ def get_v2_text():
     return v2_text
 
 
-def make_categories_pie(choose,static_map):
-    _,block = choose
+def make_categories_pie(choose, static_map):
+    _, block = choose
     block_key = str(block)
     block_info = static_map[block_key]
 
     data = []
 
-    for c,v in config.categories_map.items():
-        data.append([v, block_info["static"].get(c,0)])
+    for c, v in config.categories_map.items():
+        data.append([v, block_info["static"].get(c, 0)])
 
     pie = (
         Pie()
         .add("", data)
         .set_global_opts(title_opts=opts.TitleOpts(is_show=False))
-        .set_colors(["#008B8B","#97FFFF","#FFE4E1","#4169E1","#66CD00","#B3EE3A","#BC8F8F","#FF6A6A","#FF8247","#FF4500"])
+        .set_colors(["#008B8B", "#97FFFF", "#FFE4E1", "#4169E1", "#66CD00", "#B3EE3A", "#BC8F8F", "#FF6A6A", "#FF8247",
+                     "#FF4500"])
         .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
     )
 
-    st_pyecharts(pie,height="500px")
+    st_pyecharts(pie, height="500px")
 
-def map3d_with_bar3d(example_data,tag=1) -> Map3D:
-    if tag==1:
+
+def map3d_with_bar3d(example_data, tag=1) -> Map3D:
+    if tag == 1:
         ditu = (
             Map3D()
             .add_schema(
@@ -542,27 +544,27 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
                 # bar_size=0.5,
                 shading="lambert",
                 label_opts=opts.LabelOpts(
-                        is_show=True,
-                        formatter=JsCode(
-                            "function(data){return data.name + data.value[2];}"
-                        ),
-                        color="white",
-                        font_size=15,
+                    is_show=True,
+                    formatter=JsCode(
+                        "function(data){return data.name + data.value[2];}"
                     ),
+                    color="white",
+                    font_size=15,
+                ),
 
             )
             .set_global_opts(title_opts=opts.TitleOpts(title="分布情况"),
-                    visualmap_opts=opts.VisualMapOpts(is_show=False),
-                    tooltip_opts=opts.TooltipOpts(is_show=True),
-                    )
+                             visualmap_opts=opts.VisualMapOpts(is_show=False),
+                             tooltip_opts=opts.TooltipOpts(is_show=True),
+                             )
             .render_embed()
         )
-        components.html(ditu,height=500,width=700)
-    if tag==2:
+        components.html(ditu, height=500, width=700)
+    if tag == 2:
         base_data = []
         scaling = 1000
         for d in example_data:
-            base_data.extend([[d[0],*d[1]] for i in range(max(d[1][-1]//scaling,1))])
+            base_data.extend([[d[0], *d[1]] for i in range(max(d[1][-1] // scaling, 1))])
         for idx, sublist in enumerate(base_data):
             base_data[idx][-1] *= 0.035
 
@@ -579,21 +581,22 @@ def map3d_with_bar3d(example_data,tag=1) -> Map3D:
 
         df_size = len(df)
 
-        df["lat"] = df["lat"] + np.random.randn(df_size)/50
-        df["lon"] = df["lon"] + np.random.randn(df_size)/50
+        df["lat"] = df["lat"] + np.random.randn(df_size) / 50
+        df["lon"] = df["lon"] + np.random.randn(df_size) / 50
 
-        st.map(df,longitude="lon",latitude="lat",size="value",color="color",zoom=10)
+        st.map(df, longitude="lon", latitude="lat", size="value", color="color", zoom=10)
 
 
-def make_map_static(cat,city_index,children_size,city_seq,static):
+def make_map_static(cat, city_index, children_size, city_seq, static):
     city_key = str(city_index)
-    data = [(city_seq[city_index],[*static[city_key]["loc"],10])]
-    for p in range(city_index+1,city_index+children_size):
+    data = [(city_seq[city_index], [*static[city_key]["loc"], 10])]
+    for p in range(city_index + 1, city_index + children_size):
         p_key = str(p)
         p_info = static[p_key]
         if cat in p_info["static"]:
-            data.append((city_seq[p],[*p_info["loc"],p_info["static"][cat]]))
+            data.append((city_seq[p], [*p_info["loc"], p_info["static"][cat]]))
     return data
+
 
 if __name__ == '__main__':
     main()
