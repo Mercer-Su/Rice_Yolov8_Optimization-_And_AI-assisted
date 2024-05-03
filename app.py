@@ -193,21 +193,21 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric('天气情况', forecastToday['weather'])
         if forecastToday['weather'] == "晴":
-            set_background(r"sunny.jpg")
+            set_background(r"log\sunny.jpg")
         elif forecastToday['weather'] == "多云":
-            set_background(r"cloudy.jpg")
+            set_background(r"log\cloudy.jpg")
         elif forecastToday['weather'] == "阴":
-            set_background(r"ccloudy.jpg")
+            set_background(r"log\ccloudy.jpg")
         elif forecastToday['weather'] == "小雨" or forecastToday['weather'] == "中雨" or forecastToday[
             'weather'] == "大雨":
-            set_background(r"rainy.jpg")
+            set_background(r"log\rainy.jpg")
         elif forecastToday['weather'] == "小雪" or forecastToday['weather'] == "中雪" or forecastToday[
             'weather'] == "大雪":
-            set_background(r"snowy.jpg")
+            set_background(r"log\snowy.jpg")
         elif forecastToday['weather'] == "雾" or forecastToday['weather'] == "霾":
-            set_background(r'fog.jpg')
+            set_background(r'log\fog.jpg')
         else:
-            set_background(r"cloudy.jpg")
+            set_background(r"log\cloudy.jpg")
         col2.metric('当前温度', forecastToday['temp'])
         col3.metric('当前体感温度', forecastToday['realFeel'])
         col4.metric('湿度', forecastToday['humidity'])
@@ -432,14 +432,14 @@ def get_city_weather(cityId):
         weather=result['condition']['weather'],
         wind=f"{result['condition']['windDir']}{result['condition']['windLevel']}级",
         updateTime=(datetime.datetime.fromtimestamp(result['condition']['updateTime']) + datetime.timedelta(
-            hours=0)).strftime('%H:%M:%S')
+            hours=8)).strftime('%H:%M:%S')
     )
 
     # 24 hours forecast
     forecastHours = []
     for i in result['forecastHours']['forecastHour']:
         tmp = {}
-        tmp['PredictTime'] = (datetime.datetime.fromtimestamp(i['predictTime']) + datetime.timedelta(hours=0)).strftime(
+        tmp['PredictTime'] = (datetime.datetime.fromtimestamp(i['predictTime']) + datetime.timedelta(hours=8)).strftime(
             '%H:%M')
         tmp['Temperature'] = i['temp']
         tmp['Body Temperature'] = i['realFeel']
@@ -454,7 +454,7 @@ def get_city_weather(cityId):
     day_format = {1: '昨天', 0: '今天', -1: '明天', -2: '后天'}
     for i in result['forecastDays']['forecastDay']:
         tmp = {}
-        now = datetime.datetime.fromtimestamp(i['predictDate']) + datetime.timedelta(hours=0)
+        now = datetime.datetime.fromtimestamp(i['predictDate']) + datetime.timedelta(hours=8)
         diff = (st.session_state.date_time - now).days
         festival = i['festival']
         tmp['PredictDate'] = (day_format[diff] if diff in day_format else now.strftime('%m/%d')) + (
