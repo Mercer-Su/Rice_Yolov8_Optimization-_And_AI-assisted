@@ -432,7 +432,7 @@ def get_city_weather(cityId):
         weather=result['condition']['weather'],
         wind=f"{result['condition']['windDir']}{result['condition']['windLevel']}级",
         updateTime=(datetime.datetime.fromtimestamp(result['condition']['updateTime']) + datetime.timedelta(
-            hours=8)).strftime('%H:%M:%S')
+            hours=0)).strftime('%H:%M:%S')
     )
 
     # 24 hours forecast
