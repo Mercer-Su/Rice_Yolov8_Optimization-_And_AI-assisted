@@ -18,4 +18,4 @@ streamlit_echarts==0.4.0
 streamlit_webrtc==0.47.6
 ultralytics==8.1.47
 
-libgl1-mesa-glx
+opencv-python-headless
