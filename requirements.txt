@@ -1,5 +1,5 @@
 opencv-python-headless
-opencv_python
+
 altair
 av
 dashscope
