@@ -197,7 +197,7 @@ def main():
         elif forecastToday['weather'] == "多云":
             set_background(r"cloudy.jpg")
         elif forecastToday['weather'] == "阴":
-            set_background(r"cloudy.jpg")
+            set_background(r"ccloudy.jpg")
         elif forecastToday['weather'] == "小雨" or forecastToday['weather'] == "中雨" or forecastToday[
             'weather'] == "大雨":
             set_background(r"rainy.jpg")
