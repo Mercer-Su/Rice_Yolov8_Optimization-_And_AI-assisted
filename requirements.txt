@@ -20,3 +20,4 @@ torch==2.2.2
 ultralytics==8.1.47
 
 opencv-python-headless
+libgl1-mesa-glx
