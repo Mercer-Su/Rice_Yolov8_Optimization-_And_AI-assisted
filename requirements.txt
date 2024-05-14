@@ -5,7 +5,6 @@ graphviz==0.20.3
 matplotlib==3.8.4
 numpy==1.26.4
 
-opencv_python_headless
 pandas==2.2.2
 Pillow==10.3.0
 plotly==5.21.0
@@ -17,4 +16,3 @@ streamlit_antd_components==0.3.2
 streamlit_echarts==0.4.0
 streamlit_webrtc==0.47.6
 ultralytics==8.1.47
-libgl1-mesa-glx
