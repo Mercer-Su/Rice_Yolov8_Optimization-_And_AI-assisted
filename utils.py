@@ -16,34 +16,30 @@ import dashscope
 
 dashscope.api_key = "sk-6ca9b64b3b004a6c9fad176e7ba2b446"
 
-
 @st.cache_resource
 def load_map():
     path = "./city_map.json"
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, 'r',encoding='utf-8') as f:
         map_data = json.load(f)
-
+    
     seq = map_data['seq']
     tree = map_data['tree']
-    return tree, seq
-
+    return tree,seq
 
 def load_static():
     path = "./static.json"
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, 'r',encoding='utf-8') as f:
         static_data = json.load(f)
     return static_data
 
-
 def save_static(static_data):
     path = "./static.json"
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(static_data, f, ensure_ascii=False, indent=4)
+    with open(path, 'w',encoding='utf-8') as f:
+        json.dump(static_data,f,ensure_ascii=False,indent=4)
     f.close()
 
-
-def make_map(choose, static_map):
-    city, block = choose
+def make_map(choose,static_map):
+    city,block = choose
     city_key = str(city)
     block_key = str(block)
 
@@ -52,17 +48,16 @@ def make_map(choose, static_map):
 
     import numpy as np
 
-    data = [{"lat": city_info["loc"][1], "lon": city_info["loc"][0], "size": 100, "color": np.random.rand(4).tolist()},
-            {"lat": block_info["loc"][1], "lon": block_info["loc"][0], "size": 500,
-             "color": np.random.rand(4).tolist()},
-            {"lat": block_info["loc"][1] + 0.01, "lon": block_info["loc"][0] + 0.01, "size": 800,
-             "color": np.random.rand(4).tolist()}
+    data = [{"lat": city_info["loc"][1],"lon":city_info["loc"][0],"size":100,"color":np.random.rand(4).tolist()},
+            {"lat":block_info["loc"][1],"lon":block_info["loc"][0],"size":500,"color":np.random.rand(4).tolist()},
+            {"lat":block_info["loc"][1]+0.01,"lon":block_info["loc"][0]+0.01,"size":800,"color":np.random.rand(4).tolist()}
             ]
 
     return pd.DataFrame(data)
 
 
-def infer_uploaded_image(conf, model, source_img=None, ban_btn=False):
+
+def infer_uploaded_image(conf, model,source_img=None,ban_btn=False):
     """
     执行图片推理
     :param conf: Confidence of YOLO model
@@ -75,7 +70,7 @@ def infer_uploaded_image(conf, model, source_img=None, ban_btn=False):
             type=("jpg", "jpeg", "png", 'bmp', 'webp')
         )
 
-    # 页面划分一个区域用于显示检测前后的图片（一行两列）
+    #页面划分一个区域用于显示检测前后的图片（一行两列）
     col1, col2 = st.columns(2)
     with col1:
         if source_img is not None:
@@ -91,9 +86,9 @@ def infer_uploaded_image(conf, model, source_img=None, ban_btn=False):
             )
 
     if source_img is not None:
-
+        
         if not ban_btn:
-            st.button("执行", use_container_width=True)
+            st.button("执行",use_container_width=True)
 
         with st.spinner("执行中..."):
             """yolo预测返回的结果全在返回变量res中
@@ -109,36 +104,36 @@ def infer_uploaded_image(conf, model, source_img=None, ban_btn=False):
             res = model.predict(uploaded_image,
                                 conf=conf)
             print(res)
-            labels = res[0].names
+            labels=res[0].names
             print(labels)
             boxes = res[0].boxes
-            # 关于下面的plot()见  本类中 _display_detected_frames方法对它解释(在下面)
+            #关于下面的plot()见  本类中 _display_detected_frames方法对它解释(在下面)
             res_plotted = res[0].plot()[:, :, ::-1]
             print(type(res_plotted))
             with col2:
                 st.image(res_plotted,
-                         caption="Detected Image",
-                         use_column_width=True)
+                        caption="Detected Image",
+                        use_column_width=True)
                 try:
-                    # 统计一张图片中Label 个数及数量 显示在前端页面中
-                    with st.expander("检测结果", expanded=False):
-                        labels_num_dict = {}
+                    #统计一张图片中Label 个数及数量 显示在前端页面中
+                    with st.expander("检测结果",expanded=False):
+                        labels_num_dict={}
                         for box in boxes:
                             print(box)
-                            lable_index = box.cls.cpu().detach().numpy()[0].astype(int)
+                            lable_index=box.cls.cpu().detach().numpy()[0].astype(int)
                             for key in labels.keys():
-                                if int(lable_index) == key:
+                                if int(lable_index)==key:
                                     if labels[key] in labels_num_dict:
-                                        labels_num_dict[labels[key]] += 1
+                                        labels_num_dict[labels[key]]+=1
                                     else:
                                         labels_num_dict[labels[key]] = 1
                         return labels_num_dict
                 except Exception as ex:
                     st.write("没有选择待检测的图片!")
                     st.write(ex)
+                    
 
-
-def _display_detected_frames(conf, model, st_frame, st_text, image):
+def _display_detected_frames(conf, model, st_frame,st_text, image):
     """
     逐帧推理
     :param conf (float): Confidence threshold for object detection.
@@ -175,18 +170,16 @@ def _display_detected_frames(conf, model, st_frame, st_text, image):
     """
     # 将后处理的检测目标(带框)逐帧显示在页面上
     st_frame.image(res_plotted,
-                   caption='Detected Video',
-                   channels="BGR",
-                   use_column_width=True
-                   )
-    # 这里也可以把yolo预测的所有信息、所有数据全部写到页面中
+       caption='Detected Video',
+       channels="BGR",
+       use_column_width=True
+       )
+    #这里也可以把yolo预测的所有信息、所有数据全部写到页面中
     # try:
     #    with st.expander("检测结果", expanded=False):
     #        st_text.write(res[0])
     # except Exception as e:
     #        st_text.error(e)
-
-
 @st.cache_resource
 def load_model(model_path):
     """
@@ -199,7 +192,6 @@ def load_model(model_path):
     model = YOLO(model_path)
     return model
 
-
 def infer_uploaded_video(conf, model):
     """
     执行视频推理
@@ -210,7 +202,7 @@ def infer_uploaded_video(conf, model):
     source_video = st.file_uploader(
         label="选择一个视频..."
     )
-    # 在页面中显示传入的原始视频
+    #在页面中显示传入的原始视频
     if source_video:
         st.video(source_video)
 
@@ -234,7 +226,7 @@ def infer_uploaded_video(conf, model):
                 #                          st_text,
                 #                          image
                 #                          )
-                predict = infer_uploaded_image(conf, model, image[:, :, ::-1], True)
+                predict = infer_uploaded_image(conf, model, image[:,:,::-1],True)
                 if predict:
                     return predict
             else:
@@ -255,7 +247,7 @@ def infer_uploaded_webcam(conf, model):
     if img:
         predict = infer_uploaded_image(conf, model, img)
         return predict
-
+    
     # try:
     #     flag = st.button(
     #         label="终止执行"
@@ -280,7 +272,6 @@ def infer_uploaded_webcam(conf, model):
     #             break
     # except Exception as e:
     #     st.error(f"Error loading video: {str(e)}")
-
 
 #         def transform(self, frame):
 #             img = frame.to_ndarray(format="bgr24")  # 将帧转换为ndarray格式
@@ -314,7 +305,9 @@ class VideoTransformer(VideoTransformerBase):
         return av.VideoFrame.from_ndarray(res_plotted, format="bgr24")
 
 
-def call_with_messages(text, pred):
+
+def call_with_messages(text,pred):
+
     template = '''
     你是一名灾害防治专家，请你根据天气情况和灾害情况进行建议
 
@@ -322,11 +315,11 @@ def call_with_messages(text, pred):
 
     当前灾害情况：{pred}
     
-    请结合天气情况和灾害情况只给出不超过300字的水稻的完整治理方案
+    请结合天气情况和灾害情况只给出不超过300字的水稻的治理方案
     
     '''
 
-    messages = [{"role": "user", "content": template.format(text=text, pred=pred)}]
+    messages = [{"role":"user","content":template.format(text=text,pred=pred)}]
 
     response = dashscope.Generation.call(
         # dashscope.Generation.Models.qwen_turbo,
@@ -342,6 +335,7 @@ def call_with_messages(text, pred):
     else:
         res = '请求异常'
     return res
+
 
 # 使用WebRTC进行网络摄像头视频流处理
 # def infer_uploaded_webcam_http(conf, model):
