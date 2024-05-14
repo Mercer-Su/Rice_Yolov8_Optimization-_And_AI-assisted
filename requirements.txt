@@ -4,14 +4,13 @@ dashscope
 graphviz
 matplotlib
 numpy
-
 pandas
 Pillow
 plotly
 pydeck
 pyecharts
 Requests
-streamli
+streamlit
 streamlit_antd_components
 streamlit_echarts
 streamlit_webrtc
