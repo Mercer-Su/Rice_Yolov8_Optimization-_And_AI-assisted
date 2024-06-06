@@ -32,5 +32,3 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
-## 项目演示
-https://riceauxiliarysystem.streamlit.app/
