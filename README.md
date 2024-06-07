@@ -17,7 +17,7 @@ pip3 install torch torchvision torchaudio --index-url https://download.pytorch.o
 
 ```shell
 git clone https://github.com/yeyupiaoling/VoiceprintRecognition-Pytorch.git
-cd VoiceprintRecognition-Pytorch/
+cd Rice_Yolov8_Optimization-_And_AI-assisted/
 pip install .
 ```
 
